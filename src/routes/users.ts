@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { prisma } from "../lib/prisma";
 
 const router = Router();
 
@@ -15,31 +16,33 @@ const users = [
   },
 ];
 
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
-  console.log(id);
-  console.log(users);
-
-  const user = users.find((u) => u.id === id);
-
-  console.log(user);
-if (!user) {
-  return res.status(404).json({
-    message: "Usuario no encontrado",
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
   });
-}
+
+  if (!user) {
+    return res.status(404).json({
+      message: "Usuario no encontrado",
+    });
+  }
+
   res.json(user);
 });
 
-router.post("/", (req, res) => {
-  users.push({
-    id: users.length + 1,
-    name: req.body.name,
-    email: req.body.email,
+router.post("/", async (req, res) => {
+  const newUser = await prisma.user.create({
+    data: {
+      name: req.body.name,
+      email: req.body.email,
+    },
   });
 
-  res.json(users);
+  res.status(201).json(newUser);
 });
 
 export default router;
