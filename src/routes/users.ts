@@ -86,8 +86,22 @@ try {
 
 router.put("/:id", async (req, res) => {
   const id = Number(req.params.id);
+  const { name, email } = req.body;
 
-  const user = await prisma.user.findUnique({
+  if (!name) {
+  return res.status(400).json({
+    message: "Name is required",
+  });
+}
+
+if (!email) {
+  return res.status(400).json({
+    message: "Email is required",
+  });
+}
+
+  try {
+     const user = await prisma.user.findUnique({
     where: {
       id,
     },
@@ -104,18 +118,33 @@ router.put("/:id", async (req, res) => {
       id,
     },
     data: {
-      name: req.body.name,
-      email: req.body.email,
+      name,
+      email,
     },
   });
 
-  res.json(updatedUser);
+  return res.json(updatedUser);
+}  catch (error) {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  ) {
+    return res.status(409).json({
+      message: "Email already exists",
+    });
+  }
+
+  return res.status(500).json({
+    message: "Internal server error",
+  });
+}
 });
 
 router.delete("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
-  const user = await prisma.user.findUnique({
+ try{
+const user = await prisma.user.findUnique({
     where: {
       id,
     },
@@ -136,6 +165,11 @@ router.delete("/:id", async (req, res) => {
   return res.json({
   message: "Usuario eliminado correctamente",
 });
+ } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
 });
 
 export default router;
