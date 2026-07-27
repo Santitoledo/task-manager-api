@@ -1,10 +1,12 @@
-import { prisma } from "../lib/prisma";
+
+ import { prisma } from "../lib/prisma"; 
 import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
+import { getUsersService, getUserByIdService } from "../services/users.services";
 
 export async function getUsers(req: Request, res: Response) {
   try {
-    const users = await prisma.user.findMany();
+    const users = await getUsersService();
 
     return res.json(users);
   } catch (error) {
@@ -24,11 +26,8 @@ export async function getUserById(req: Request, res: Response) {
   }
 
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id,
-      },
-    });
+    const user = await getUserByIdService(id);
+
 
     if (!user) {
       return res.status(404).json({
