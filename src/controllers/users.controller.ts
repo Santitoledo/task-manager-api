@@ -2,7 +2,7 @@
  import { prisma } from "../lib/prisma"; 
 import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
-import { getUsersService, getUserByIdService } from "../services/users.services";
+import { getUsersService, getUserByIdService, createUserService, updateUserService, deleteUserService} from "../services/users.services";
 
 export async function getUsers(req: Request, res: Response) {
   try {
@@ -60,12 +60,7 @@ export async function createUser(req: Request, res: Response) {
   }
   
   try {
-    const newUser = await prisma.user.create({
-      data: {
-        name,
-        email,
-      },
-    });
+    const newUser = await createUserService(name, email);
   
     return res.status(201).json(newUser);
   
@@ -108,29 +103,16 @@ export async function updateUser(req: Request, res: Response) {
  }
  
    try {
-      const user = await prisma.user.findUnique({
-     where: {
-       id,
-     },
-   });
+      const user = await updateUserService(id, name ,email);
+   
  
    if (!user) {
      return res.status(404).json({
        message: "Usuario no encontrado",
      });
    }
- 
-   const updatedUser = await prisma.user.update({
-     where: {
-       id,
-     },
-     data: {
-       name,
-       email,
-     },
-   });
- 
-   return res.json(updatedUser);
+  return res.json(user);
+
  }  catch (error) {
    if (
      error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -157,23 +139,14 @@ export async function deleteUser(req: Request, res: Response) {
   }
 
  try {
-const user = await prisma.user.findUnique({
-    where: {
-      id,
-    },
-  });
+const user = await deleteUserService(id);
+ 
 
   if (!user) {
     return res.status(404).json({
       message: "Usuario no encontrado",
     });
   }
-
-await prisma.user.delete({
-    where: {
-      id,
-    },
-  });
 
   return res.json({
   message: "Usuario eliminado correctamente",

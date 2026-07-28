@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { getUsers, getUserById, createUser, updateUser, deleteUser } from "../controllers/users.controller";
+import {apiKey} from "../middlewares/apiKey.middleware";
 
 const router = Router();
 
+router.use(apiKey);
 
 router.get("/", getUsers);
 
