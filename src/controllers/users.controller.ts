@@ -1,8 +1,9 @@
 
- import { prisma } from "../lib/prisma"; 
+ // import { prisma } from "../lib/prisma";  controller ya no necesita a prisma
 import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 import { getUsersService, getUserByIdService, createUserService, updateUserService, deleteUserService} from "../services/users.services";
+import { createUserSchema, userIdSchema  } from "../schemas/user.schema";
 
 export async function getUsers(req: Request, res: Response) {
   try {
@@ -17,13 +18,14 @@ export async function getUsers(req: Request, res: Response) {
 }
 
 export async function getUserById(req: Request, res: Response) {
-  const id = Number(req.params.id);
-
-    if (isNaN(id)) {
-    return res.status(400).json({
-      message: "Invalid user id",
-    });
-  }
+ 
+const result = userIdSchema.safeParse(req.params);
+if (!result.success) {
+  return res.status(400).json({
+    errors: result.error.issues,
+  });
+}
+const { id } = result.data;
 
   try {
     const user = await getUserByIdService(id);
@@ -45,20 +47,16 @@ export async function getUserById(req: Request, res: Response) {
 }
 
 export async function createUser(req: Request, res: Response) {
-  const { name, email } = req.body;
-  
-  if (!name) {
-    return res.status(400).json({
-      message: "Name is required",
-    });
-  }
-  
-  if (!email) {
-    return res.status(400).json({
-      message: "Email is required",
-    });
-  }
-  
+
+const result = createUserSchema.safeParse(req.body);
+
+if (!result.success) {
+  return res.status(400).json({
+    errors: result.error.issues,
+  });
+}
+  const { name, email } = result.data;
+
   try {
     const newUser = await createUserService(name, email);
   
@@ -81,36 +79,33 @@ export async function createUser(req: Request, res: Response) {
    }
 
 export async function updateUser(req: Request, res: Response) {
- const id = Number(req.params.id);
-   const { name, email } = req.body;
 
-      if (isNaN(id)) {
-    return res.status(400).json({
-      message: "Invalid user id",
-    });
-  }
- 
-   if (!name) {
-   return res.status(400).json({
-     message: "Name is required",
-   });
- }
- 
- if (!email) {
-   return res.status(400).json({
-     message: "Email is required",
-   });
- }
- 
+const idResult = userIdSchema.safeParse(req.params);
+if (!idResult.success) {
+  return res.status(400).json({
+    errors: idResult.error.issues,
+  });
+}
+const { id } = idResult.data;
+
+const bodyResult = createUserSchema.safeParse(req.body);
+ if (!bodyResult.success) {
+  return res.status(400).json({
+    errors: bodyResult.error.issues,
+  });
+}
+const { name, email } = bodyResult.data;
+
    try {
-      const user = await updateUserService(id, name ,email);
+      const user = await updateUserService(id, name, email);
    
  
    if (!user) {
      return res.status(404).json({
        message: "Usuario no encontrado",
      });
-   }
+   } 
+   
   return res.json(user);
 
  }  catch (error) {
@@ -130,14 +125,14 @@ export async function updateUser(req: Request, res: Response) {
  }
 
 export async function deleteUser(req: Request, res: Response) {
-   const id = Number(req.params.id);
-
-      if (isNaN(id)) {
-    return res.status(400).json({
-      message: "Invalid user id",
-    });
-  }
-
+  
+const idResult = userIdSchema.safeParse(req.params);
+if (!idResult.success) {
+  return res.status(400).json({
+    errors: idResult.error.issues,
+  });
+}
+const { id } = idResult.data;
  try {
 const user = await deleteUserService(id);
  

@@ -8,7 +8,7 @@ export function apiKey(
 ) {
     const apiKey = req.headers["x-api-key"];
 
-    if ( apiKey !== process.env.API_KEY){
+    if ( apiKey !== process.env.API_KEY){ // variable de entorno
          return res.status(401).json({
       message: "Api Key Incorrecta",
     });
