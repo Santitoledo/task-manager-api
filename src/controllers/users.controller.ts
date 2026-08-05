@@ -55,10 +55,10 @@ if (!result.success) {
     errors: result.error.issues,
   });
 }
-  const { name, email } = result.data;
+  const { name, email, password } = result.data;
 
   try {
-    const newUser = await createUserService(name, email);
+    const newUser = await createUserService(name, email, password);
   
     return res.status(201).json(newUser);
   

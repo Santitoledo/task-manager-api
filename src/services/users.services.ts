@@ -1,4 +1,6 @@
 import { prisma } from "../lib/prisma";
+import bcrypt from "bcrypt";
+
 
 export async function getUsersService() {
   return prisma.user.findMany();
@@ -13,11 +15,13 @@ export async function getUserByIdService(id: number) {
   });
 }
 
-export async function createUserService (name: string, email: string){
+export async function createUserService (name: string, email: string, password: string){
+  const hashedPassword = await bcrypt.hash(password,10)
     return prisma.user.create({
         data: {
             name,
             email,
+            password: hashedPassword,
         },
     });
 }
