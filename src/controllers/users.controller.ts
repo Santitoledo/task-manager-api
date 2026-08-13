@@ -3,7 +3,7 @@
 import { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 import { getUsersService, getUserByIdService, createUserService, updateUserService, deleteUserService} from "../services/users.services";
-import { createUserSchema, userIdSchema  } from "../schemas/user.schema";
+import { createUserSchema, userIdSchema, updateUserSchema   } from "../schemas/user.schema";
 
 export async function getUsers(req: Request, res: Response) {
   try {
@@ -88,7 +88,7 @@ if (!idResult.success) {
 }
 const { id } = idResult.data;
 
-const bodyResult = createUserSchema.safeParse(req.body);
+const bodyResult = updateUserSchema.safeParse(req.body);
  if (!bodyResult.success) {
   return res.status(400).json({
     errors: bodyResult.error.issues,

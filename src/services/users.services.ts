@@ -3,7 +3,13 @@ import bcrypt from "bcrypt";
 
 
 export async function getUsersService() {
-  return prisma.user.findMany();
+  return prisma.user.findMany({
+    select: {   //selecciona las propiedades que queremos
+      id: true,
+      name: true,
+      email: true,
+    },
+  });
 }
 
 
@@ -11,6 +17,11 @@ export async function getUserByIdService(id: number) {
   return prisma.user.findUnique({
     where: {
       id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
     },
   });
 }
@@ -23,28 +34,49 @@ export async function createUserService (name: string, email: string, password: 
             email,
             password: hashedPassword,
         },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
     });
 }
 
-export async function updateUserService(id: number,name: string,email: string) {
+export async function updateUserService(
+  id: number,
+  name?: string,
+  email?: string
+) {
   const user = await prisma.user.findUnique({
     where: {
       id,
     },
+    select: {
+          id: true,
+          name: true,
+          email: true,
+        },
   });
 
   if (!user) {
     return null;
   }
 
+  const data: { name?: string; email?: string } = {};
+
+  if (name !== undefined) {
+    data.name = name;
+  }
+
+  if (email !== undefined) {
+    data.email = email;
+  }
+
   return prisma.user.update({
     where: {
       id,
     },
-    data: {
-      name,
-      email,
-    },
+    data,
   });
 }
 
