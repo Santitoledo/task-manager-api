@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import { getUsersService, getUserByIdService, createUserService, updateUserService, deleteUserService} from "../services/users.services";
 import { createUserSchema, userIdSchema, updateUserSchema   } from "../schemas/user.schema";
 
+
 export async function getUsers(req: Request, res: Response) {
   try {
     const users = await getUsersService();
@@ -91,13 +92,13 @@ const { id } = idResult.data;
 const bodyResult = updateUserSchema.safeParse(req.body);
  if (!bodyResult.success) {
   return res.status(400).json({
-    errors: bodyResult.error.issues,
+    message: bodyResult.error.issues[0]?.message,
   });
 }
-const { name, email } = bodyResult.data;
+const data = bodyResult.data;
 
    try {
-      const user = await updateUserService(id, name, email);
+      const user = await updateUserService(id, data);
    
  
    if (!user) {

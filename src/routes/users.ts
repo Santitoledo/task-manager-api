@@ -15,7 +15,7 @@ router.get("/:id", authMiddleware, getUserById);
 
 router.post("/", createUser);
  
-router.put("/:id",authMiddleware, updateUser);
+router.patch("/:id", authMiddleware, updateUser);
 
 router.delete("/:id",authMiddleware, requireAdmin, deleteUser);
 

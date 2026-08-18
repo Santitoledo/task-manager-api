@@ -15,6 +15,7 @@ export const updateUserSchema = z.object({
     message: "At least one field must be provided",
   }
 );
+export type UpdateUserInput = z.infer<typeof updateUserSchema>; //TypeScript, creame automáticamente un tipo basándote en updateUserSchema.
 
 export const userIdSchema = z.object({
   id: z.coerce.number().int().positive(),

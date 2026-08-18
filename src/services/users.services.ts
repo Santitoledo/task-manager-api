@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
-
+import { UpdateUserInput } from "../schemas/user.schema";
 
 export async function getUsersService() {
   return prisma.user.findMany({
@@ -44,9 +44,10 @@ export async function createUserService (name: string, email: string, password: 
 
 export async function updateUserService(
   id: number,
-  name?: string,
-  email?: string
-) {
+  data: UpdateUserInput
+)
+ 
+ {
   const user = await prisma.user.findUnique({
     where: {
       id,
@@ -62,24 +63,32 @@ export async function updateUserService(
     return null;
   }
 
-  const data: { name?: string; email?: string } = {};
+const updateData: {
+  name?: string;
+  email?: string;
+} = {};
 
-  if (name !== undefined) {
-    data.name = name;
-  }
-
-  if (email !== undefined) {
-    data.email = email;
-  }
-
-  return prisma.user.update({
-    where: {
-      id,
-    },
-    data,
-  });
+if (data.name !== undefined) {
+  updateData.name = data.name;
 }
 
+if (data.email !== undefined) {
+  updateData.email = data.email;
+}
+
+ return prisma.user.update({
+  where: {
+    id,
+  },
+  data: updateData,
+  select: {
+    id: true,
+    name: true,
+    email: true,
+    role: true,
+  },
+});
+}
 export async function deleteUserService(id: number) {
   const user = await prisma.user.findUnique({
     where: {
