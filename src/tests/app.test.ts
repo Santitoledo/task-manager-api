@@ -1,8 +1,13 @@
 import request from "supertest";
 import app from "../app";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
+import { prisma } from "../lib/prisma";
 
 describe("API", () => {
+
+  beforeEach(async () => {
+  await prisma.user.deleteMany();  //limpiamos la DB test
+});
 
   it("GET / should return API funcionando", async () => {
 
