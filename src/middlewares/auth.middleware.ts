@@ -31,6 +31,7 @@ export function authMiddleware(
   }
 
   try {
+    //console.log("JWT_SECRET middleware:", process.env.JWT_SECRET);
     const decoded = jwt.verify(
   token,
   process.env.JWT_SECRET!
